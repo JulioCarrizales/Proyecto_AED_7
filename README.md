@@ -111,7 +111,6 @@ recorridos para reunir las coincidencias.
 
 ---
 
-## Equipo
+## Autor
 
 - Julio Carrizales
-- *(añadir integrantes)*
