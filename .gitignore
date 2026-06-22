@@ -1,0 +1,25 @@
+# Binarios y compilados de Go
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+/bin/
+/dist/
+
+# Archivos de test
+*.test
+*.out
+coverage.*
+
+# Dependencias del frontend (Entregable 4)
+frontend/node_modules/
+frontend/dist/
+.env
+.env.local
+
+# Editores / SO
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
