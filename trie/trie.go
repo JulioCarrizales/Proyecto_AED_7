@@ -1,13 +1,3 @@
-// Package trie implementa un Radix Trie (árbol PATRICIA) desde cero.
-//
-// Referencia: Morrison (1968), "PATRICIA — Practical Algorithm To Retrieve
-// Information Coded In Alphanumeric", JACM.
-//
-// Un Radix Trie es un trie comprimido: las cadenas de nodos con un solo hijo
-// se fusionan en una sola arista etiquetada con varios caracteres. Esto reduce
-// el consumo de memoria y acelera las búsquedas frente a un trie clásico.
-//
-// Caso de uso del proyecto: autocompletado de palabras por prefijo.
 package trie
 
 import (
@@ -17,9 +7,9 @@ import (
 
 // node es un nodo del Radix Trie.
 type node struct {
-	label    string           // segmento de arista que llega a este nodo desde su padre
-	isWord   bool             // true si una palabra termina exactamente en este nodo
-	children map[byte]*node   // hijos indexados por el primer byte de su label
+	label    string         // segmento de arista que llega a este nodo desde su padre
+	isWord   bool           // true si una palabra termina exactamente en este nodo
+	children map[byte]*node // hijos indexados por el primer byte de su label
 }
 
 func newNode(label string) *node {
