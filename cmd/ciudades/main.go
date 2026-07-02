@@ -44,7 +44,7 @@ func main() {
 	}
 	if n == 0 {
 		fmt.Println("Tabla vacía: cargando dataset de ciudades del Perú...")
-		insertadas, err := store.Seed(ctx, db.CiudadesPeru)
+		insertadas, err := store.Seed(ctx, db.Dataset())
 		if err != nil {
 			log.Fatal(err)
 		}

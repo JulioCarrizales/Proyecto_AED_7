@@ -127,3 +127,44 @@ var CiudadesPeru = []Ciudad{
 	{"Ventanilla", "Callao"},
 	{"Carmen de la Legua", "Callao"},
 }
+
+// DepartamentosPeru son los 24 departamentos del Perú más la Provincia
+// Constitucional del Callao. Se añaden como lugares para que también aparezcan
+// en el autocompletado.
+var DepartamentosPeru = []Ciudad{
+	{"Amazonas", "Amazonas"},
+	{"Áncash", "Áncash"},
+	{"Apurímac", "Apurímac"},
+	{"Arequipa", "Arequipa"},
+	{"Ayacucho", "Ayacucho"},
+	{"Cajamarca", "Cajamarca"},
+	{"Callao", "Callao"},
+	{"Cusco", "Cusco"},
+	{"Huancavelica", "Huancavelica"},
+	{"Huánuco", "Huánuco"},
+	{"Ica", "Ica"},
+	{"Junín", "Junín"},
+	{"La Libertad", "La Libertad"},
+	{"Lambayeque", "Lambayeque"},
+	{"Lima", "Lima"},
+	{"Loreto", "Loreto"},
+	{"Madre de Dios", "Madre de Dios"},
+	{"Moquegua", "Moquegua"},
+	{"Pasco", "Pasco"},
+	{"Piura", "Piura"},
+	{"Puno", "Puno"},
+	{"San Martín", "San Martín"},
+	{"Tacna", "Tacna"},
+	{"Tumbes", "Tumbes"},
+	{"Ucayali", "Ucayali"},
+}
+
+// Dataset devuelve el conjunto completo de lugares a cargar en la base de datos:
+// ciudades/distritos y departamentos. Las repeticiones (una capital que también
+// es departamento) se ignoran al insertar gracias a la restricción UNIQUE.
+func Dataset() []Ciudad {
+	completo := make([]Ciudad, 0, len(CiudadesPeru)+len(DepartamentosPeru))
+	completo = append(completo, CiudadesPeru...)
+	completo = append(completo, DepartamentosPeru...)
+	return completo
+}
