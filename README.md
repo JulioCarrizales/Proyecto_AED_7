@@ -1,24 +1,22 @@
 # Proyecto_AED_7 — Radix / Patricia Trie
 
-Proyecto grupal del curso **Algoritmos y Estructura de Datos** (ESAN, 2026-1).
+Proyecto del curso **Algoritmos y Estructura de Datos** (ESAN, 2026-1).
 Estructura asignada (N.º 7): **Radix / Patricia Trie**.
 
 > Paper de referencia: Morrison (1968), *"PATRICIA — Practical Algorithm To
 > Retrieve Information Coded In Alphanumeric"*, JACM.
 
-**Caso de uso:** autocompletado de palabras conforme se teclea un prefijo.
+**Caso de uso:** autocompletado de nombres de ciudades del Perú conforme se
+teclea un prefijo, con los datos cargados desde una base de datos real.
 
 ---
 
 ## ¿Qué es un Radix / Patricia Trie?
 
-Un **trie** es un árbol que indexa cadenas carácter por carácter: cada arista
-representa una letra y cada camino de la raíz a un nodo "palabra" representa una
-cadena almacenada.
-
-Un **Radix Trie (PATRICIA)** es un trie **comprimido**: cuando una cadena de
-nodos tiene un solo hijo, esos nodos se fusionan en una sola arista etiquetada
-con varias letras. Eso ahorra memoria y acelera la búsqueda.
+Un **trie** es un árbol que indexa cadenas carácter por carácter. Un **Radix
+Trie (PATRICIA)** es un trie **comprimido**: cuando una cadena de nodos tiene un
+solo hijo, esos nodos se fusionan en una sola arista etiquetada con varias
+letras. Eso ahorra memoria y acelera la búsqueda.
 
 ```
 Trie clásico para {casa, caso}:        Radix Trie equivalente:
@@ -32,28 +30,34 @@ Trie clásico para {casa, caso}:        Radix Trie equivalente:
    (casa)    (caso)
 ```
 
-Operaciones principales (todas en `O(L)`, con `L` = longitud de la palabra):
+Operaciones (con `L` = longitud de la palabra):
 
-| Operación | Qué hace |
-|-----------|----------|
-| `Insert(word)` | Inserta una palabra, partiendo aristas cuando hace falta |
-| `Search(word)` | Indica si la palabra exacta existe |
-| `Autocomplete(prefix)` | Devuelve todas las palabras que empiezan con el prefijo |
-| `Keys()` | Devuelve todas las palabras ordenadas |
+| Operación | Qué hace | Complejidad |
+|-----------|----------|-------------|
+| `Insert(word)` | Inserta una palabra, partiendo aristas cuando hace falta | `O(L)` |
+| `Search(word)` | Indica si la palabra exacta existe | `O(L)` |
+| `Delete(word)` | Elimina una palabra y re-comprime el árbol | `O(L)` |
+| `Autocomplete(prefix)` | Devuelve las palabras que empiezan con el prefijo | `O(P + K)` |
+| `Keys()` | Devuelve todas las palabras ordenadas | `O(N·L)` |
+
+`P` = longitud del prefijo, `K` = caracteres recorridos para reunir las
+coincidencias, `N` = número de palabras.
 
 ---
 
-## Estado actual del proyecto (avance)
+## Estado de los entregables
 
-- [x] Esqueleto del repositorio en Go
-- [x] **Entregable 2 (inicio):** estructura implementada desde cero en `trie/`
-      con `Insert`, `Search`, `Autocomplete` y `Keys`
-- [x] Pruebas unitarias (`trie/trie_test.go`) — **pasan**
-- [x] Demo de consola en `cmd/demo`
-- [ ] Benchmarks de las operaciones clave
-- [ ] **Entregable 1:** PPTX tipo clase + video explicativo
-- [ ] **Entregable 3:** app en Go conectada a una base de datos real
-- [ ] **Entregable 4:** simulación interactiva (backend Go + frontend Vue.js)
+- [x] **Entregable 2 — Codificación en Go**
+  - [x] Estructura implementada desde cero en `trie/` (`Insert`, `Search`, `Delete`, `Autocomplete`, `Keys`)
+  - [x] Pruebas unitarias (`trie/trie_test.go`)
+  - [x] Benchmarks (`trie/trie_bench_test.go`)
+  - [x] Repositorio con historial de commits y este README
+- [x] **Entregable 3 — Aplicación con base de datos real**
+  - [x] Conexión Go ↔ Supabase (PostgreSQL) por su API REST sobre HTTPS
+  - [x] Dataset real de ciudades del Perú cargado en la BD
+  - [x] El trie resuelve autocompletado sobre esos datos (`cmd/ciudades`)
+- [ ] **Entregable 1 — PPTX tipo clase + video explicativo**
+- [ ] **Entregable 4 — Simulación con Go + Vue.js**
 
 ---
 
@@ -62,52 +66,83 @@ Operaciones principales (todas en `O(L)`, con `L` = longitud de la palabra):
 ```
 Proyecto_AED_7/
 ├── go.mod
-├── README.md
-├── trie/                 # Entregable 2 — la estructura de datos
-│   ├── trie.go           #   implementación del Radix Trie
-│   └── trie_test.go      #   pruebas unitarias
+├── .env.example              # plantilla de configuración (copiar a .env)
+├── trie/                     # Entregable 2 — la estructura de datos
+│   ├── trie.go               #   implementación del Radix Trie
+│   ├── trie_test.go          #   pruebas unitarias
+│   └── trie_bench_test.go    #   benchmarks
+├── internal/db/              # Entregable 3 — capa de base de datos
+│   ├── db.go                 #   conexión a Supabase por REST/HTTPS
+│   └── seed.go               #   dataset de ciudades del Perú
 └── cmd/
-    └── demo/
-        └── main.go       # demo de consola del autocompletado
+    ├── demo/main.go          # demo del trie por consola (sin base de datos)
+    └── ciudades/main.go      # app que carga las ciudades de la BD al trie
 ```
 
-Más adelante se añadirán:
-
-```
-├── internal/db/          # Entregable 3 — carga del dataset desde la BD
-├── cmd/server/           # Entregable 4 — API en Go que expone el trie
-└── frontend/             # Entregable 4 — interfaz en Vue.js
-```
+El paquete `trie` es **independiente**: no sabe de bases de datos ni de
+interfaces. Por eso puede reutilizarse tal cual en los entregables 3 y 4, sin
+reimplementar la estructura.
 
 ---
 
 ## Cómo ejecutar
 
-Requisitos: **Go 1.24+**.
+Requisitos: **Go 1.25+**.
+
+### Pruebas y benchmarks (Entregable 2)
 
 ```bash
-# Ejecutar las pruebas
+# Ejecutar las pruebas unitarias
 go test ./...
 
-# Ejecutar la demo de autocompletado por consola
+# Ejecutar las pruebas del trie con detalle
+go test ./trie/ -v
+
+# Ejecutar los benchmarks
+go test ./trie/ -bench=. -benchmem -run=^$
+```
+
+### Demo del trie por consola (sin base de datos)
+
+```bash
 go run ./cmd/demo
 ```
 
-En la demo, escribe un prefijo (por ejemplo `cas`) y verás las palabras que lo
-completan.
+### App con base de datos real (Entregable 3)
+
+1. Copia `.env.example` a `.env` y completa tus datos de Supabase:
+   ```
+   SUPABASE_URL=https://TU-PROYECTO.supabase.co
+   SUPABASE_KEY=sb_secret_tu_llave_secreta
+   ```
+2. Crea la tabla en Supabase (SQL Editor):
+   ```sql
+   create table if not exists ciudades (
+     id serial primary key,
+     nombre text not null unique,
+     departamento text
+   );
+   ```
+3. Ejecuta la app (carga las ciudades y ofrece autocompletado):
+   ```bash
+   go run ./cmd/ciudades
+   ```
+
+Escribe un prefijo (por ejemplo `Cu`) y verás las ciudades que lo completan.
+
+> El `.env` está en `.gitignore`: las credenciales nunca se suben al repositorio.
 
 ---
 
-## Análisis de complejidad (Big-O)
+## Detalle técnico: la conexión a la base de datos
 
-| Operación | Tiempo | Espacio |
-|-----------|--------|---------|
-| `Insert` | `O(L)` | `O(L)` en el peor caso (nueva rama) |
-| `Search` | `O(L)` | `O(1)` |
-| `Autocomplete` | `O(P + K)` | `O(K)` para el resultado |
+Se usa la **API REST de Supabase sobre HTTPS (puerto 443)** en lugar del driver
+de PostgreSQL (puerto 5432), porque muchas redes bloquean el puerto de la base
+de datos, mientras que el 443 casi siempre está disponible. El flujo es:
 
-`L` = longitud de la palabra, `P` = longitud del prefijo, `K` = caracteres
-recorridos para reunir las coincidencias.
+```
+Supabase (tabla ciudades)  →  internal/db (HTTP)  →  Radix Trie  →  autocompletado
+```
 
 ---
 

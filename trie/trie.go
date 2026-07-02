@@ -98,6 +98,56 @@ func (t *Trie) Search(word string) bool {
 	return cur.isWord
 }
 
+// Delete elimina una palabra del trie. Devuelve true si la palabra existía
+// (y por lo tanto se eliminó) o false si no estaba.
+// Tras eliminar, el árbol se re-comprime: los nodos que quedan sin uso se
+// borran y los que quedan con un solo hijo se fusionan.
+// Complejidad: O(L).
+func (t *Trie) Delete(word string) bool {
+	if deleteRec(t.root, word) {
+		t.size--
+		return true
+	}
+	return false
+}
+
+// deleteRec elimina rem a partir del nodo n y, al volver, compacta el hijo
+// afectado (lo borra si quedó inútil o lo fusiona si quedó con un solo hijo).
+func deleteRec(n *node, rem string) bool {
+	if rem == "" {
+		if !n.isWord {
+			return false
+		}
+		n.isWord = false
+		return true
+	}
+
+	child, ok := n.children[rem[0]]
+	if !ok || !strings.HasPrefix(rem, child.label) {
+		return false
+	}
+	if !deleteRec(child, rem[len(child.label):]) {
+		return false
+	}
+
+	switch {
+	case !child.isWord && len(child.children) == 0:
+		// Hoja que ya no es palabra: se elimina.
+		delete(n.children, rem[0])
+	case !child.isWord && len(child.children) == 1:
+		// Nodo intermedio no-palabra con un solo hijo: se fusiona con él
+		// para mantener el árbol comprimido.
+		var unico *node
+		for _, c := range child.children {
+			unico = c
+		}
+		child.label += unico.label
+		child.isWord = unico.isWord
+		child.children = unico.children
+	}
+	return true
+}
+
 // Autocomplete devuelve todas las palabras que empiezan con prefix,
 // ordenadas alfabéticamente. Es la operación clave de la demo del proyecto.
 // Complejidad: O(P + K) donde P es la longitud del prefijo y K el número de

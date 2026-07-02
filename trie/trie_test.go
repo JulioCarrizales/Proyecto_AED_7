@@ -61,6 +61,55 @@ func TestAutocomplete(t *testing.T) {
 	}
 }
 
+func TestDelete(t *testing.T) {
+	tr := New()
+	for _, w := range []string{"casa", "casaca", "caso", "castor"} {
+		tr.Insert(w)
+	}
+
+	// Borrar una palabra existente.
+	if !tr.Delete("caso") {
+		t.Fatal("Delete(\"caso\") = false; se esperaba true")
+	}
+	if tr.Search("caso") {
+		t.Error("\"caso\" sigue existiendo tras eliminarla")
+	}
+	// Las demás deben seguir intactas.
+	for _, w := range []string{"casa", "casaca", "castor"} {
+		if !tr.Search(w) {
+			t.Errorf("%q desapareció tras borrar \"caso\"", w)
+		}
+	}
+	if tr.Len() != 3 {
+		t.Errorf("Len() = %d tras borrar una; se esperaba 3", tr.Len())
+	}
+
+	// Borrar algo que no existe no debe cambiar nada.
+	if tr.Delete("gato") {
+		t.Error("Delete(\"gato\") = true; se esperaba false")
+	}
+	if tr.Len() != 3 {
+		t.Errorf("Len() = %d tras borrar inexistente; se esperaba 3", tr.Len())
+	}
+}
+
+func TestDeletePrefijoQueEsPalabra(t *testing.T) {
+	// "cas" es palabra y además prefijo de "caso".
+	tr := New()
+	tr.Insert("cas")
+	tr.Insert("caso")
+
+	if !tr.Delete("cas") {
+		t.Fatal("Delete(\"cas\") = false; se esperaba true")
+	}
+	if tr.Search("cas") {
+		t.Error("\"cas\" sigue existiendo tras eliminarla")
+	}
+	if !tr.Search("caso") {
+		t.Error("\"caso\" desapareció al borrar \"cas\"")
+	}
+}
+
 func TestKeys(t *testing.T) {
 	tr := New()
 	for _, w := range []string{"sol", "sal", "luna"} {
