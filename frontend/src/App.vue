@@ -58,9 +58,12 @@ onMounted(cargarArbol)
 </script>
 
 <template>
-  <header>
-    <h1>Radix Trie — Simulación interactiva</h1>
-    <p>Proyecto AED 7 · backend en Go + frontend en Vue.js</p>
+  <header class="topbar">
+    <img class="logo" src="/logo-esan.png" alt="Universidad ESAN" />
+    <div>
+      <h1>Radix Trie — Simulación interactiva</h1>
+      <p>Proyecto AED 7 · backend en Go + frontend en Vue.js</p>
+    </div>
   </header>
 
   <div class="grid">
@@ -103,9 +106,9 @@ onMounted(cargarArbol)
       </div>
 
       <div class="legend">
-        <span><i class="dot" style="background:#22c55e"></i> nodo que termina una palabra</span>
-        <span><i class="dot" style="background:#0b1220;border:2px solid #64748b"></i> nodo intermedio</span>
-        <span><i class="dot" style="background:#f59e0b"></i> resaltado por el texto</span>
+        <span><i class="dot" style="background:#d8231f"></i> nodo que termina una palabra</span>
+        <span><i class="dot" style="background:#fff;border:2px solid #94a3b8"></i> nodo intermedio</span>
+        <span><i class="dot" style="background:#e8a400"></i> resaltado por el texto</span>
       </div>
     </section>
   </div>

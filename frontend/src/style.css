@@ -1,12 +1,13 @@
 :root {
-  --bg: #0f172a;
-  --card: #1e293b;
-  --card-border: #334155;
-  --text: #e2e8f0;
-  --muted: #94a3b8;
-  --accent: #38bdf8;
-  --accent-2: #22c55e;
-  --highlight: #f59e0b;
+  --esan-red: #d8231f;
+  --esan-red-dark: #a81813;
+  --bg: #f4f4f5;
+  --card: #ffffff;
+  --card-border: #e5e7eb;
+  --text: #1f2937;
+  --muted: #6b7280;
+  --node-word: #d8231f;   /* nodo que termina una palabra */
+  --highlight: #e8a400;   /* resaltado por el texto buscado */
 }
 
 * {
@@ -23,17 +24,34 @@ body {
 #app {
   max-width: 1100px;
   margin: 0 auto;
-  padding: 24px 20px 60px;
+  padding: 0 20px 60px;
 }
 
-header h1 {
-  margin: 0 0 4px;
-  font-size: 1.6rem;
+/* Barra superior con el logo de la universidad */
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 20px 0;
+  margin-bottom: 24px;
+  border-bottom: 4px solid var(--esan-red);
 }
 
-header p {
-  margin: 0 0 24px;
+.topbar .logo {
+  height: 60px;
+  width: auto;
+}
+
+.topbar h1 {
+  margin: 0 0 2px;
+  font-size: 1.5rem;
+  color: var(--esan-red);
+}
+
+.topbar p {
+  margin: 0;
   color: var(--muted);
+  font-size: 0.9rem;
 }
 
 .grid {
@@ -46,6 +64,10 @@ header p {
   .grid {
     grid-template-columns: 1fr;
   }
+  .topbar {
+    flex-direction: column;
+    text-align: center;
+  }
 }
 
 .card {
@@ -53,11 +75,13 @@ header p {
   border: 1px solid var(--card-border);
   border-radius: 12px;
   padding: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
 }
 
 .card h2 {
   margin: 0 0 4px;
   font-size: 1.15rem;
+  color: var(--esan-red);
 }
 
 .card .hint {
@@ -71,14 +95,15 @@ input[type="text"] {
   padding: 10px 12px;
   border-radius: 8px;
   border: 1px solid var(--card-border);
-  background: #0b1220;
+  background: #fff;
   color: var(--text);
   font-size: 1rem;
 }
 
 input[type="text"]:focus {
   outline: none;
-  border-color: var(--accent);
+  border-color: var(--esan-red);
+  box-shadow: 0 0 0 3px rgba(216, 35, 31, 0.15);
 }
 
 .row {
@@ -90,7 +115,7 @@ button {
   padding: 10px 14px;
   border-radius: 8px;
   border: 1px solid var(--card-border);
-  background: #0b1220;
+  background: #fff;
   color: var(--text);
   cursor: pointer;
   font-size: 0.9rem;
@@ -98,18 +123,26 @@ button {
 }
 
 button:hover {
-  border-color: var(--accent);
+  border-color: var(--esan-red);
+  color: var(--esan-red);
 }
 
 button.primary {
-  background: var(--accent);
-  color: #0b1220;
-  border-color: var(--accent);
+  background: var(--esan-red);
+  color: #fff;
+  border-color: var(--esan-red);
   font-weight: 600;
 }
 
+button.primary:hover {
+  background: var(--esan-red-dark);
+  border-color: var(--esan-red-dark);
+  color: #fff;
+}
+
 button.danger:hover {
-  border-color: #ef4444;
+  border-color: var(--esan-red);
+  color: var(--esan-red);
 }
 
 .matches {
@@ -122,8 +155,9 @@ button.danger:hover {
 }
 
 .matches li {
-  background: #0b1220;
-  border: 1px solid var(--card-border);
+  background: #fdecec;
+  border: 1px solid #f3c6c4;
+  color: var(--esan-red-dark);
   border-radius: 999px;
   padding: 6px 12px;
   font-size: 0.85rem;
@@ -140,7 +174,7 @@ button.danger:hover {
   overflow: auto;
   border: 1px solid var(--card-border);
   border-radius: 8px;
-  background: #0b1220;
+  background: #fafafa;
   padding: 8px;
 }
 

@@ -103,7 +103,7 @@ const layout = computed(() => {
   display: block;
 }
 .edge {
-  stroke: #475569;
+  stroke: #cbd5e1;
   stroke-width: 2;
 }
 .edge.hi {
@@ -111,22 +111,22 @@ const layout = computed(() => {
   stroke-width: 3;
 }
 .edge-label {
-  fill: #cbd5e1;
+  fill: #475569;
   font-size: 13px;
   font-family: "Consolas", monospace;
 }
 .edge-label.hi {
-  fill: var(--highlight);
+  fill: #b8860b;
   font-weight: 700;
 }
 .node {
-  fill: #0b1220;
-  stroke: #64748b;
+  fill: #ffffff;
+  stroke: #94a3b8;
   stroke-width: 2;
 }
 .node.word {
-  fill: var(--accent-2);
-  stroke: var(--accent-2);
+  fill: var(--node-word);
+  stroke: var(--node-word);
 }
 .node.hi {
   stroke: var(--highlight);
