@@ -27,18 +27,18 @@ func BenchmarkInsert(b *testing.B) {
 	palabras := benchWords()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		tr := New()
+		tr := New[struct{}]()
 		for _, w := range palabras {
-			tr.Insert(w)
+			tr.Insert(w, struct{}{})
 		}
 	}
 }
 
 func BenchmarkSearch(b *testing.B) {
 	palabras := benchWords()
-	tr := New()
+	tr := New[struct{}]()
 	for _, w := range palabras {
-		tr.Insert(w)
+		tr.Insert(w, struct{}{})
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -48,9 +48,9 @@ func BenchmarkSearch(b *testing.B) {
 
 func BenchmarkAutocomplete(b *testing.B) {
 	palabras := benchWords()
-	tr := New()
+	tr := New[struct{}]()
 	for _, w := range palabras {
-		tr.Insert(w)
+		tr.Insert(w, struct{}{})
 	}
 	prefijos := []string{"ab", "ca", "lo", "pe", "ma", "za"}
 	b.ResetTimer()
@@ -64,9 +64,9 @@ func BenchmarkDelete(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		b.StopTimer()
-		tr := New()
+		tr := New[struct{}]()
 		for _, w := range palabras {
-			tr.Insert(w)
+			tr.Insert(w, struct{}{})
 		}
 		b.StartTimer()
 		for _, w := range palabras {

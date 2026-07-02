@@ -52,13 +52,14 @@ func main() {
 	}
 
 	// 3. Cargar las ciudades DESDE la BD hacia el Radix Trie.
-	nombres, err := store.ListNombres(ctx)
+	//    Cada ciudad (clave) guarda su departamento como valor genérico.
+	ciudades, err := store.ListCiudades(ctx)
 	if err != nil {
 		log.Fatal(err)
 	}
-	t := trie.New()
-	for _, nombre := range nombres {
-		t.Insert(nombre)
+	t := trie.New[string]()
+	for _, c := range ciudades {
+		t.Insert(c.Nombre, c.Departamento)
 	}
 	fmt.Printf("Radix Trie cargado con %d ciudades desde la base de datos.\n\n", t.Len())
 
@@ -75,7 +76,9 @@ func main() {
 		if len(sugerencias) == 0 {
 			fmt.Println("  (sin coincidencias)")
 		} else {
-			fmt.Printf("  %s\n", strings.Join(sugerencias, ", "))
+			for _, m := range sugerencias {
+				fmt.Printf("  %s (%s)\n", m.Key, m.Value)
+			}
 		}
 		fmt.Print("> ")
 	}

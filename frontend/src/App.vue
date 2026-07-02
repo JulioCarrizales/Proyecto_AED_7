@@ -78,7 +78,9 @@ onMounted(cargarArbol)
         placeholder="Escribe un prefijo, p. ej. Cu"
       />
       <ul class="matches" v-if="cityMatches.length">
-        <li v-for="c in cityMatches" :key="c">{{ c }}</li>
+        <li v-for="c in cityMatches" :key="c.nombre">
+          {{ c.nombre }}<span class="dep" v-if="c.departamento"> · {{ c.departamento }}</span>
+        </li>
       </ul>
       <p class="empty" v-else-if="cityLoaded">Sin coincidencias para ese prefijo.</p>
       <p class="empty" v-else>Empieza a escribir para ver las sugerencias.</p>

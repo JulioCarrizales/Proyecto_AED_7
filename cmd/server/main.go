@@ -21,8 +21,8 @@ import (
 // cities: trie de solo lectura con las ciudades cargadas desde la base de datos.
 // viz: trie que el usuario construye en vivo desde la web (protegido por vizMu).
 var (
-	cities *trie.Trie
-	viz    *trie.Trie
+	cities *trie.Trie[string]   // ciudad -> departamento
+	viz    *trie.Trie[struct{}] // árbol interactivo usado como conjunto
 	vizMu  sync.Mutex
 )
 
@@ -33,10 +33,9 @@ var vizSeed = []string{"casa", "caso", "castor", "catedral", "perro", "pera", "p
 func main() {
 	loadEnv(".env")
 
-	cities = trie.New()
+	cities = trie.New[string]()
 	cargarCiudades()
 
-	viz = trie.New()
 	resetViz()
 
 	mux := http.NewServeMux()
@@ -73,32 +72,40 @@ func cargarCiudades() {
 	}
 	defer store.Close()
 
-	nombres, err := store.ListNombres(ctx)
+	ciudades, err := store.ListCiudades(ctx)
 	if err != nil {
 		log.Printf("Aviso: no se pudieron cargar las ciudades: %v", err)
 		return
 	}
-	for _, n := range nombres {
-		cities.Insert(n)
+	for _, c := range ciudades {
+		cities.Insert(c.Nombre, c.Departamento)
 	}
 	log.Printf("Cargadas %d ciudades desde la base de datos.", cities.Len())
 }
 
 func resetViz() {
-	viz = trie.New()
+	viz = trie.New[struct{}]()
 	for _, w := range vizSeed {
-		viz.Insert(w)
+		viz.Insert(w, struct{}{})
 	}
+}
+
+// ciudadResp es una coincidencia de ciudad enviada al frontend.
+type ciudadResp struct {
+	Nombre       string `json:"nombre"`
+	Departamento string `json:"departamento"`
 }
 
 // handleCities: autocompletado de ciudades reales (Entregable 3 sobre HTTP).
 func handleCities(w http.ResponseWriter, r *http.Request) {
 	prefijo := strings.TrimSpace(r.URL.Query().Get("prefix"))
-	var coincidencias []string
+	coincidencias := []ciudadResp{}
 	if prefijo != "" {
-		coincidencias = cities.Autocomplete(prefijo)
-		if len(coincidencias) > 25 {
-			coincidencias = coincidencias[:25]
+		for _, m := range cities.Autocomplete(prefijo) {
+			coincidencias = append(coincidencias, ciudadResp{Nombre: m.Key, Departamento: m.Value})
+			if len(coincidencias) >= 25 {
+				break
+			}
 		}
 	}
 	writeJSON(w, map[string]any{"prefix": prefijo, "matches": coincidencias})
@@ -117,7 +124,7 @@ func handleTreeInsert(w http.ResponseWriter, r *http.Request) {
 	vizMu.Lock()
 	defer vizMu.Unlock()
 	if palabra != "" {
-		viz.Insert(palabra)
+		viz.Insert(palabra, struct{}{})
 	}
 	writeJSON(w, viz.View())
 }

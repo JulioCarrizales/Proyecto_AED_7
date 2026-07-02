@@ -131,16 +131,16 @@ func (s *Store) Seed(ctx context.Context, ciudades []Ciudad) (int, error) {
 	return len(insertadas), nil
 }
 
-// ListNombres devuelve todos los nombres de ciudad ordenados. Es lo que se
-// carga en el Radix Trie para el autocompletado.
-func (s *Store) ListNombres(ctx context.Context) ([]string, error) {
-	req, err := s.newRequest(ctx, http.MethodGet, "/ciudades?select=nombre&order=nombre.asc", nil)
+// ListCiudades devuelve todas las ciudades (nombre y departamento) ordenadas
+// por nombre. Es lo que se carga en el Radix Trie para el autocompletado.
+func (s *Store) ListCiudades(ctx context.Context) ([]Ciudad, error) {
+	req, err := s.newRequest(ctx, http.MethodGet, "/ciudades?select=nombre,departamento&order=nombre.asc", nil)
 	if err != nil {
 		return nil, err
 	}
 	resp, err := s.http.Do(req)
 	if err != nil {
-		return nil, fmt.Errorf("consultando nombres: %w", err)
+		return nil, fmt.Errorf("consultando ciudades: %w", err)
 	}
 	defer resp.Body.Close()
 
@@ -149,16 +149,9 @@ func (s *Store) ListNombres(ctx context.Context) ([]string, error) {
 		return nil, fmt.Errorf("respuesta inesperada (%d): %s", resp.StatusCode, strings.TrimSpace(string(b)))
 	}
 
-	var filas []struct {
-		Nombre string `json:"nombre"`
+	var ciudades []Ciudad
+	if err := json.NewDecoder(resp.Body).Decode(&ciudades); err != nil {
+		return nil, fmt.Errorf("leyendo ciudades: %w", err)
 	}
-	if err := json.NewDecoder(resp.Body).Decode(&filas); err != nil {
-		return nil, fmt.Errorf("leyendo nombres: %w", err)
-	}
-
-	nombres := make([]string, 0, len(filas))
-	for _, f := range filas {
-		nombres = append(nombres, f.Nombre)
-	}
-	return nombres, nil
+	return ciudades, nil
 }

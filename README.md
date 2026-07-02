@@ -30,15 +30,20 @@ Trie clásico para {casa, caso}:        Radix Trie equivalente:
    (casa)    (caso)
 ```
 
+El trie es **genérico** (`Trie[V any]`): cada clave (una cadena) lleva asociado
+un valor de tipo `V`, así que funciona como un mapa ordenado por prefijos. En la
+app de ciudades se usa como `Trie[string]` (ciudad → departamento); como simple
+conjunto se usa `Trie[struct{}]`.
+
 Operaciones (con `L` = longitud de la palabra):
 
 | Operación | Qué hace | Complejidad |
 |-----------|----------|-------------|
-| `Insert(word)` | Inserta una palabra, partiendo aristas cuando hace falta | `O(L)` |
-| `Search(word)` | Indica si la palabra exacta existe | `O(L)` |
-| `Delete(word)` | Elimina una palabra y re-comprime el árbol | `O(L)` |
-| `Autocomplete(prefix)` | Devuelve las palabras que empiezan con el prefijo | `O(P + K)` |
-| `Keys()` | Devuelve todas las palabras ordenadas | `O(N·L)` |
+| `Insert(key, value)` | Inserta una clave con su valor, partiendo aristas cuando hace falta | `O(L)` |
+| `Search(key)` | Devuelve el valor asociado y si la clave existe | `O(L)` |
+| `Delete(key)` | Elimina una clave y re-comprime el árbol | `O(L)` |
+| `Autocomplete(prefix)` | Devuelve las coincidencias (clave + valor) que empiezan con el prefijo | `O(P + K)` |
+| `Keys()` | Devuelve todas las claves ordenadas | `O(N·L)` |
 
 `P` = longitud del prefijo, `K` = caracteres recorridos para reunir las
 coincidencias, `N` = número de palabras.
@@ -183,6 +188,19 @@ Supabase (tabla ciudades)  →  internal/db (HTTP)  →  Radix Trie  →  autoco
 ```
 
 ---
+
+## Uso de herramientas de IA
+
+En línea con lo permitido por el documento del proyecto, se usaron herramientas
+de IA como apoyo, de forma transparente:
+
+- **Frontend (Vue.js):** se usó IA como apoyo para desarrollar la interfaz, ya
+  que no tenía mucho conocimiento previo de Vue.js.
+- **Comprensión del tema:** se usó IA para entender mejor la estructura de datos
+  y lo que solicitaba el enunciado del proyecto.
+
+El resto del desarrollo y la comprensión del código son responsabilidad del
+autor, que puede explicar todo lo entregado.
 
 ## Autor
 

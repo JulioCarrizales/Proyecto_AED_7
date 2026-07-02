@@ -163,6 +163,10 @@ button.danger:hover {
   font-size: 0.85rem;
 }
 
+.matches .dep {
+  color: var(--muted);
+}
+
 .empty {
   color: var(--muted);
   font-size: 0.85rem;

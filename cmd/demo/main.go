@@ -14,13 +14,14 @@ import (
 )
 
 func main() {
-	t := trie.New()
+	// Se usa como conjunto de palabras: el valor asociado es struct{} (vacío).
+	t := trie.New[struct{}]()
 	for _, w := range []string{
 		"casa", "casaca", "caso", "castor", "catedral",
 		"perro", "pera", "perla", "persona",
 		"sol", "solar", "soledad",
 	} {
-		t.Insert(w)
+		t.Insert(w, struct{}{})
 	}
 
 	fmt.Printf("Radix Trie cargado con %d palabras.\n", t.Len())
@@ -37,7 +38,11 @@ func main() {
 		if len(sugerencias) == 0 {
 			fmt.Println("  (sin coincidencias)")
 		} else {
-			fmt.Printf("  %s\n", strings.Join(sugerencias, ", "))
+			palabras := make([]string, 0, len(sugerencias))
+			for _, m := range sugerencias {
+				palabras = append(palabras, m.Key)
+			}
+			fmt.Printf("  %s\n", strings.Join(palabras, ", "))
 		}
 		fmt.Print("> ")
 	}
