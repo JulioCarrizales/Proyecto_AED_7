@@ -56,8 +56,11 @@ coincidencias, `N` = número de palabras.
   - [x] Conexión Go ↔ Supabase (PostgreSQL) por su API REST sobre HTTPS
   - [x] Dataset real de ciudades del Perú cargado en la BD
   - [x] El trie resuelve autocompletado sobre esos datos (`cmd/ciudades`)
+- [x] **Entregable 4 — Simulación con Go + Vue.js**
+  - [x] Backend en Go que expone el trie como API (`cmd/server`)
+  - [x] Frontend en Vue.js con autocompletado de ciudades y árbol interactivo (`frontend/`)
+  - [x] Reutiliza el paquete `trie` del Entregable 2 (no lo reimplementa)
 - [ ] **Entregable 1 — PPTX tipo clase + video explicativo**
-- [ ] **Entregable 4 — Simulación con Go + Vue.js**
 
 ---
 
@@ -74,9 +77,17 @@ Proyecto_AED_7/
 ├── internal/db/              # Entregable 3 — capa de base de datos
 │   ├── db.go                 #   conexión a Supabase por REST/HTTPS
 │   └── seed.go               #   dataset de ciudades del Perú
-└── cmd/
-    ├── demo/main.go          # demo del trie por consola (sin base de datos)
-    └── ciudades/main.go      # app que carga las ciudades de la BD al trie
+├── cmd/
+│   ├── demo/main.go          # demo del trie por consola (sin base de datos)
+│   ├── ciudades/main.go      # app que carga las ciudades de la BD al trie
+│   └── server/main.go        # Entregable 4 — API en Go que expone el trie
+└── frontend/                 # Entregable 4 — interfaz en Vue.js (Vite)
+    ├── index.html
+    ├── package.json
+    └── src/
+        ├── App.vue           #   paneles: autocompletado + árbol interactivo
+        └── components/
+            └── TrieTree.vue  #   dibuja el árbol en SVG
 ```
 
 El paquete `trie` es **independiente**: no sabe de bases de datos ni de
@@ -131,6 +142,33 @@ go run ./cmd/demo
 Escribe un prefijo (por ejemplo `Cu`) y verás las ciudades que lo completan.
 
 > El `.env` está en `.gitignore`: las credenciales nunca se suben al repositorio.
+
+### Simulación web con Vue.js (Entregable 4)
+
+Necesita **Node.js 18+** además de Go.
+
+```bash
+# 1. Instalar dependencias del frontend (una sola vez)
+cd frontend
+npm install
+
+# 2. Compilar el frontend
+npm run build
+cd ..
+
+# 3. Levantar el servidor (sirve la web y la API en el mismo puerto)
+go run ./cmd/server
+```
+
+Luego abre **http://localhost:8080** en el navegador. Verás dos paneles:
+
+- **Autocompletado de ciudades**: escribe un prefijo y consulta los datos reales de la BD.
+- **Árbol interactivo**: inserta o elimina palabras y observa cómo el Radix Trie
+  se comprime y divide sus nodos; al escribir, se resalta la rama correspondiente.
+
+> Para desarrollo del frontend con recarga en caliente: en una terminal
+> `go run ./cmd/server` y en otra `cd frontend && npm run dev` (Vite en el
+> puerto 5173 redirige las llamadas `/api` al backend).
 
 ---
 

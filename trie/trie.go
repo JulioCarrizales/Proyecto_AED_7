@@ -187,6 +187,36 @@ func (t *Trie) Keys() []string {
 	return out
 }
 
+// NodeView es la representación exportable de un nodo, pensada para serializar
+// el árbol a JSON (por ejemplo, para la visualización del Entregable 4).
+type NodeView struct {
+	Label    string      `json:"label"`
+	IsWord   bool        `json:"isWord"`
+	Children []*NodeView `json:"children"`
+}
+
+// View devuelve una copia serializable del árbol completo, con los hijos
+// ordenados por su etiqueta para obtener una representación estable.
+func (t *Trie) View() *NodeView {
+	return viewNode(t.root)
+}
+
+func viewNode(n *node) *NodeView {
+	v := &NodeView{Label: n.label, IsWord: n.isWord, Children: []*NodeView{}}
+
+	etiquetas := make([]string, 0, len(n.children))
+	porEtiqueta := make(map[string]*node, len(n.children))
+	for _, c := range n.children {
+		etiquetas = append(etiquetas, c.label)
+		porEtiqueta[c.label] = c
+	}
+	sort.Strings(etiquetas)
+	for _, e := range etiquetas {
+		v.Children = append(v.Children, viewNode(porEtiqueta[e]))
+	}
+	return v
+}
+
 // collect recorre el subárbol acumulando las palabras. acc es la cadena
 // completa desde la raíz hasta n (incluyendo el label de n).
 func collect(n *node, acc string, out []string) []string {
