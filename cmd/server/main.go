@@ -55,8 +55,23 @@ func main() {
 	log.Fatal(http.ListenAndServe(addr, withCORS(mux)))
 }
 
-// cargarCiudades trae las ciudades desde Supabase hacia el trie de solo lectura.
+// cargarCiudades trae las ciudades hacia el trie de solo lectura. Si la variable
+// LOCAL_DB apunta a un archivo SQLite, usa esa base local (modo sin internet);
+// en caso contrario, usa Supabase.
 func cargarCiudades() {
+	if path := os.Getenv("LOCAL_DB"); path != "" {
+		ciudades, err := db.LoadSQLite(path)
+		if err != nil {
+			log.Printf("Aviso: no se pudo abrir la BD local (%v); ciudades vacías.", err)
+			return
+		}
+		for _, c := range ciudades {
+			cities.Insert(c.Nombre, c.Departamento)
+		}
+		log.Printf("Cargadas %d ciudades desde la BD local %s.", cities.Len(), path)
+		return
+	}
+
 	url, key := os.Getenv("SUPABASE_URL"), os.Getenv("SUPABASE_KEY")
 	if url == "" || key == "" {
 		log.Print("Aviso: sin SUPABASE_URL/KEY; el autocompletado de ciudades quedará vacío.")

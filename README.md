@@ -148,6 +148,24 @@ Escribe un prefijo (por ejemplo `Cu`) y verás las ciudades que lo completan.
 
 > El `.env` está en `.gitignore`: las credenciales nunca se suben al repositorio.
 
+### Ejecución sin internet (base de datos local)
+
+La carpeta `data_local/` incluye una base de datos **SQLite** (`ciudades.db`) con
+las mismas 125 ciudades, para ejecutar la aplicación sin conexión a Supabase.
+Basta con definir la variable `LOCAL_DB` (tiene prioridad sobre Supabase):
+
+```bash
+# PowerShell (Windows)
+$env:LOCAL_DB="data_local/ciudades.db"; go run ./cmd/server
+
+# Bash
+LOCAL_DB=data_local/ciudades.db go run ./cmd/server
+```
+
+Además, `data_local/autocompletado_local.html` es una página autónoma (sin
+servidor ni internet) con el autocompletado ya funcionando: se abre con doble
+clic en cualquier navegador.
+
 ### Simulación web con Vue.js (Entregable 4)
 
 Necesita **Node.js 18+** además de Go.

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Autocompletado de ciudades (local)</title>
+<style>
+  :root { --esan-red:#d8231f; --esan-red-dark:#a81813; --bg:#f4f4f5; --card:#fff;
+          --border:#e5e7eb; --text:#1f2937; --muted:#6b7280; }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:"Segoe UI",system-ui,sans-serif; background:var(--bg); color:var(--text); }
+  .wrap { max-width:760px; margin:0 auto; padding:28px 20px 60px; }
+  header { border-bottom:4px solid var(--esan-red); padding-bottom:16px; margin-bottom:24px; }
+  h1 { margin:0 0 4px; color:var(--esan-red); font-size:1.5rem; }
+  header p { margin:0; color:var(--muted); font-size:.9rem; }
+  .card { background:var(--card); border:1px solid var(--border); border-radius:12px;
+          padding:20px; box-shadow:0 1px 3px rgba(0,0,0,.06); }
+  h2 { margin:0 0 4px; color:var(--esan-red); font-size:1.15rem; }
+  .hint { margin:0 0 16px; color:var(--muted); font-size:.85rem; }
+  input { width:100%; padding:11px 13px; border-radius:8px; border:1px solid var(--border);
+          font-size:1rem; }
+  input:focus { outline:none; border-color:var(--esan-red); box-shadow:0 0 0 3px rgba(216,35,31,.15); }
+  ul { list-style:none; margin:14px 0 0; padding:0; display:flex; flex-wrap:wrap; gap:8px; }
+  li { background:#fdecec; border:1px solid #f3c6c4; color:var(--esan-red-dark);
+       border-radius:999px; padding:6px 12px; font-size:.85rem; }
+  li .dep { color:var(--muted); }
+  .empty { color:var(--muted); font-size:.85rem; margin-top:14px; }
+  .count { color:var(--muted); font-size:.8rem; margin-top:16px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Radix Trie &mdash; Autocompletado de ciudades</h1>
+    <p>Versi&oacute;n local (sin servidor ni internet) &middot; Proyecto AED 7</p>
+  </header>
+  <div class="card">
+    <h2>Autocompletado de ciudades</h2>
+    <p class="hint">Datos cargados desde la base de datos local (SQLite export).</p>
+    <input id="q" type="text" placeholder="Escribe un prefijo, p. ej. Cu" autofocus>
+    <ul id="res"></ul>
+    <p class="empty" id="empty">Empieza a escribir para ver las sugerencias.</p>
+    <p class="count" id="count"></p>
+  </div>
+</div>
+<script>
+const CIUDADES = [{"n": "Abancay", "d": "Apurímac"}, {"n": "Amazonas", "d": "Amazonas"}, {"n": "Andahuaylas", "d": "Apurímac"}, {"n": "Apurímac", "d": "Apurímac"}, {"n": "Arequipa", "d": "Arequipa"}, {"n": "Ate", "d": "Lima"}, {"n": "Ayacucho", "d": "Ayacucho"}, {"n": "Ayaviri", "d": "Puno"}, {"n": "Bagua", "d": "Amazonas"}, {"n": "Bagua Grande", "d": "Amazonas"}, {"n": "Barranca", "d": "Lima"}, {"n": "Barranco", "d": "Lima"}, {"n": "Bellavista", "d": "Callao"}, {"n": "Breña", "d": "Lima"}, {"n": "Cajabamba", "d": "Cajamarca"}, {"n": "Cajamarca", "d": "Cajamarca"}, {"n": "Callao", "d": "Callao"}, {"n": "Camaná", "d": "Arequipa"}, {"n": "Carabayllo", "d": "Lima"}, {"n": "Caraz", "d": "Áncash"}, {"n": "Carmen de la Legua", "d": "Callao"}, {"n": "Casma", "d": "Áncash"}, {"n": "Catacaos", "d": "Piura"}, {"n": "Cañete", "d": "Lima"}, {"n": "Cerro de Pasco", "d": "Pasco"}, {"n": "Chachapoyas", "d": "Amazonas"}, {"n": "Chanchamayo", "d": "Junín"}, {"n": "Chepén", "d": "La Libertad"}, {"n": "Chiclayo", "d": "Lambayeque"}, {"n": "Chimbote", "d": "Áncash"}, {"n": "Chincha Alta", "d": "Ica"}, {"n": "Chorrillos", "d": "Lima"}, {"n": "Chosica", "d": "Lima"}, {"n": "Chota", "d": "Cajamarca"}, {"n": "Chulucanas", "d": "Piura"}, {"n": "Cieneguilla", "d": "Lima"}, {"n": "Comas", "d": "Lima"}, {"n": "Cusco", "d": "Cusco"}, {"n": "Desaguadero", "d": "Puno"}, {"n": "El Agustino", "d": "Lima"}, {"n": "Ferreñafe", "d": "Lambayeque"}, {"n": "Huacho", "d": "Lima"}, {"n": "Huamachuco", "d": "La Libertad"}, {"n": "Huancavelica", "d": "Huancavelica"}, {"n": "Huancayo", "d": "Junín"}, {"n": "Huaral", "d": "Lima"}, {"n": "Huaraz", "d": "Áncash"}, {"n": "Huarmey", "d": "Áncash"}, {"n": "Huánuco", "d": "Huánuco"}, {"n": "Ica", "d": "Ica"}, {"n": "Ilave", "d": "Puno"}, {"n": "Ilo", "d": "Moquegua"}, {"n": "Independencia", "d": "Lima"}, {"n": "Iquitos", "d": "Loreto"}, {"n": "Jauja", "d": "Junín"}, {"n": "Jaén", "d": "Cajamarca"}, {"n": "Jesús María", "d": "Lima"}, {"n": "Juanjuí", "d": "San Martín"}, {"n": "Juliaca", "d": "Puno"}, {"n": "Junín", "d": "Junín"}, {"n": "La Libertad", "d": "La Libertad"}, {"n": "La Merced", "d": "Junín"}, {"n": "La Molina", "d": "Lima"}, {"n": "La Oroya", "d": "Junín"}, {"n": "La Perla", "d": "Callao"}, {"n": "La Punta", "d": "Callao"}, {"n": "La Victoria", "d": "Lima"}, {"n": "Lamas", "d": "San Martín"}, {"n": "Lambayeque", "d": "Lambayeque"}, {"n": "Lima", "d": "Lima"}, {"n": "Lince", "d": "Lima"}, {"n": "Loreto", "d": "Loreto"}, {"n": "Los Olivos", "d": "Lima"}, {"n": "Lurín", "d": "Lima"}, {"n": "Madre de Dios", "d": "Madre de Dios"}, {"n": "Magdalena del Mar", "d": "Lima"}, {"n": "Miraflores", "d": "Lima"}, {"n": "Mollendo", "d": "Arequipa"}, {"n": "Moquegua", "d": "Moquegua"}, {"n": "Motupe", "d": "Lambayeque"}, {"n": "Moyobamba", "d": "San Martín"}, {"n": "Nazca", "d": "Ica"}, {"n": "Olmos", "d": "Lambayeque"}, {"n": "Pacasmayo", "d": "La Libertad"}, {"n": "Pachacámac", "d": "Lima"}, {"n": "Paita", "d": "Piura"}, {"n": "Pasco", "d": "Pasco"}, {"n": "Pisco", "d": "Ica"}, {"n": "Piura", "d": "Piura"}, {"n": "Pucallpa", "d": "Ucayali"}, {"n": "Pueblo Libre", "d": "Lima"}, {"n": "Puente Piedra", "d": "Lima"}, {"n": "Puerto Maldonado", "d": "Madre de Dios"}, {"n": "Puno", "d": "Puno"}, {"n": "Quillabamba", "d": "Cusco"}, {"n": "Rímac", "d": "Lima"}, {"n": "San Borja", "d": "Lima"}, {"n": "San Isidro", "d": "Lima"}, {"n": "San Juan de Lurigancho", "d": "Lima"}, {"n": "San Juan de Miraflores", "d": "Lima"}, {"n": "San Luis", "d": "Lima"}, {"n": "San Martín", "d": "San Martín"}, {"n": "San Martín de Porres", "d": "Lima"}, {"n": "San Miguel", "d": "Lima"}, {"n": "Santa Anita", "d": "Lima"}, {"n": "Santiago de Surco", "d": "Lima"}, {"n": "Satipo", "d": "Junín"}, {"n": "Sechura", "d": "Piura"}, {"n": "Sicuani", "d": "Cusco"}, {"n": "Sullana", "d": "Piura"}, {"n": "Surquillo", "d": "Lima"}, {"n": "Tacna", "d": "Tacna"}, {"n": "Talara", "d": "Piura"}, {"n": "Tarapoto", "d": "San Martín"}, {"n": "Tarma", "d": "Junín"}, {"n": "Tingo María", "d": "Huánuco"}, {"n": "Trujillo", "d": "La Libertad"}, {"n": "Tumbes", "d": "Tumbes"}, {"n": "Ucayali", "d": "Ucayali"}, {"n": "Ventanilla", "d": "Callao"}, {"n": "Villa El Salvador", "d": "Lima"}, {"n": "Villa María del Triunfo", "d": "Lima"}, {"n": "Yungay", "d": "Áncash"}, {"n": "Yurimaguas", "d": "Loreto"}, {"n": "Áncash", "d": "Áncash"}];
+const norm = s => s.toLowerCase();
+const q = document.getElementById('q');
+const res = document.getElementById('res');
+const empty = document.getElementById('empty');
+const count = document.getElementById('count');
+count.textContent = CIUDADES.length + ' ciudades cargadas.';
+q.addEventListener('input', () => {
+  const p = norm(q.value.trim());
+  res.innerHTML = '';
+  if (!p) { empty.style.display='block'; empty.textContent='Empieza a escribir para ver las sugerencias.'; return; }
+  const m = CIUDADES.filter(c => norm(c.n).startsWith(p)).slice(0, 30);
+  if (m.length === 0) { empty.style.display='block'; empty.textContent='Sin coincidencias para ese prefijo.'; return; }
+  empty.style.display='none';
+  for (const c of m) {
+    const li = document.createElement('li');
+    li.innerHTML = c.n + (c.d ? ' <span class="dep">&middot; ' + c.d + '</span>' : '');
+    res.appendChild(li);
+  }
+});
+</script>
+</body>
+</html>
